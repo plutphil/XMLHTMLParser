@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <regex>
 #include<iostream>
+#include <iomanip>
 using namespace std;
 namespace XHP {
 
@@ -561,7 +562,10 @@ namespace XHP {
 		}
 
 		map<string, NodeCallbackData> callbacks;
-		//Lambda: [](XHP::Node*, void* data) {code} Func:
+		/*
+		 * Lambda: [](XHP::Node* n, void* data) {code}
+		 * Func: void bla(XHP::Node* n, void* data) {code}
+		 */
 		inline void addCallback(string selector, NodeCallback callback, void* data) {
 			callbacks[selector] = { callback,data };
 		}
@@ -579,6 +583,28 @@ namespace XHP {
 			root->print();
 		}
 	};
+	string url_encode(const string &value) {
+	    ostringstream escaped;
+	    escaped.fill('0');
+	    escaped << hex;
+
+	    for (string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+	        string::value_type c = (*i);
+
+	        // Keep alphanumeric and other accepted characters intact
+	        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+	            escaped << c;
+	            continue;
+	        }
+
+	        // Any other characters are percent-encoded
+	        escaped << uppercase;
+	        escaped << '%' << setw(2) << int((unsigned char) c);
+	        escaped << nouppercase;
+	    }
+
+	    return escaped.str();
+	}
 //#ifdef CURL_H
 #include<curl/curl.h>
 	size_t writeXHP(char *ptr, size_t size, size_t nmemb, void *userdata) {
